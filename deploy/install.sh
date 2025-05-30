@@ -161,40 +161,33 @@ setup_ssl() {
 }
 
 # Instalar Supabase Self-hosted
+
 install_supabase() {
     log "Instalando Supabase Self-hosted..."
-    
+
     mkdir -p $SUPABASE_DIR
     cd $SUPABASE_DIR
-    
-    # Baixar Supabase self-hosted
+
     git clone --depth 1 https://github.com/supabase/supabase.git .
     cd docker
-    
-    # Copiar arquivo de exemplo
     cp .env.example .env
-    
-    # Gerar chaves aleatórias
+
     JWT_SECRET=$(openssl rand -base64 32)
     ANON_KEY=$(openssl rand -base64 32)
     SERVICE_ROLE_KEY=$(openssl rand -base64 32)
     POSTGRES_PASSWORD=$(openssl rand -base64 32)
-    
-    # Configurar .env
-    sed -i "s/POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
-    sed -i "s/JWT_SECRET=your-super-secret-jwt-token-with-at-least-32-characters-long/JWT_SECRET=$JWT_SECRET/" .env
-    sed -i "s/ANON_KEY=.*$/ANON_KEY=$ANON_KEY/" .env
-    sed -i "s/SERVICE_ROLE_KEY=.*$/SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY/" .env
-    sed -i "s/SITE_URL=.*$/SITE_URL=https:\/\/$DOMAIN/" .env
-    
-    # Iniciar Supabase
+
+    sed -i "s#POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password#POSTGRES_PASSWORD=$POSTGRES_PASSWORD#" .env
+    sed -i "s#JWT_SECRET=your-super-secret-jwt-token-with-at-least-32-characters-long#JWT_SECRET=$JWT_SECRET#" .env
+    sed -i "s#ANON_KEY=.*#ANON_KEY=$ANON_KEY#" .env
+    sed -i "s#SERVICE_ROLE_KEY=.*#SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY#" .env
+    sed -i "s#SITE_URL=.*#SITE_URL=https://$DOMAIN#" .env
+
     docker-compose up -d
-    
-    # Aguardar Supabase inicializar
+
     log "Aguardando Supabase inicializar..."
     sleep 30
-    
-    # Verificar se está funcionando
+
     for i in {1..10}; do
         if curl -s http://localhost:8000/health > /dev/null; then
             log "Supabase iniciado com sucesso"
@@ -203,8 +196,7 @@ install_supabase() {
         log "Tentativa $i/10 - Aguardando Supabase..."
         sleep 10
     done
-    
-    # Salvar credenciais
+
     cat > $INSTALL_DIR/supabase-credentials.json << EOF
 {
     "url": "http://localhost:8000",
@@ -214,7 +206,7 @@ install_supabase() {
     "jwt_secret": "$JWT_SECRET"
 }
 EOF
-    
+
     log "Supabase instalado e configurado"
 }
 
