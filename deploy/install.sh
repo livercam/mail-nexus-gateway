@@ -58,27 +58,58 @@ detect_os() {
 
 # Instalar dependências
 install_dependencies() {
-    log "Instalando dependências..."
-    
+    log "Verificando e instalando dependências..."
+
+    install_if_missing() {
+        local cmd=$1
+        local pkg=$2
+        if ! command -v $cmd > /dev/null 2>&1; then
+            log "Instalando $pkg..."
+            if [[ $OS == "debian" ]]; then
+                apt-get install -y $pkg
+            elif [[ $OS == "rhel" ]]; then
+                yum install -y $pkg
+            fi
+        else
+            log "$pkg já está instalado"
+        fi
+    }
+
     if [[ $OS == "debian" ]]; then
         apt-get update
-        apt-get install -y curl wget git jq docker.io docker-compose certbot nginx ufw
+        install_if_missing curl curl
+        install_if_missing wget wget
+        install_if_missing git git
+        install_if_missing jq jq
+        install_if_missing docker docker.io
+        install_if_missing docker-compose docker-compose
+        install_if_missing certbot certbot
+        install_if_missing nginx nginx
+        install_if_missing ufw ufw
     elif [[ $OS == "rhel" ]]; then
         yum update -y
-        yum install -y curl wget git jq docker docker-compose certbot nginx firewalld
+        install_if_missing curl curl
+        install_if_missing wget wget
+        install_if_missing git git
+        install_if_missing jq jq
+        install_if_missing docker docker
+        install_if_missing docker-compose docker-compose
+        install_if_missing certbot certbot
+        install_if_missing nginx nginx
+        install_if_missing firewall-cmd firewalld
         systemctl start docker
     fi
-    
+
     systemctl enable docker
     systemctl start docker
-    
-    # Verificar se Docker está funcionando
+
     if ! docker --version > /dev/null 2>&1; then
         error "Falha na instalação do Docker"
     fi
-    
-    log "Dependências instaladas com sucesso"
+
+    log "Todas as dependências estão instaladas"
 }
+
 
 # Configurar firewall
 setup_firewall() {
