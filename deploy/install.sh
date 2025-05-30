@@ -56,7 +56,29 @@ detect_os() {
     log "Sistema detectado: $DISTRO"
 }
 
-# instalação do docker estava aqui.
+# Instalar dependências
+install_dependencies() {
+    log "Instalando dependências..."
+    
+    if [[ $OS == "debian" ]]; then
+        apt-get update
+        apt-get install -y curl wget git jq docker.io docker-compose certbot nginx ufw
+    elif [[ $OS == "rhel" ]]; then
+        yum update -y
+        yum install -y curl wget git jq docker docker-compose certbot nginx firewalld
+        systemctl start docker
+    fi
+    
+    systemctl enable docker
+    systemctl start docker
+    
+    # Verificar se Docker está funcionando
+    if ! docker --version > /dev/null 2>&1; then
+        error "Falha na instalação do Docker"
+    fi
+    
+    log "Dependências instaladas com sucesso"
+}
 
 # Configurar firewall
 setup_firewall() {
