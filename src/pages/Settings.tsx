@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Server, Mail, Database, Docker } from 'lucide-react';
+import { Save, Server, Mail, Database, Container } from 'lucide-react';
 import { AppConfig, DeployConfig } from '@/types/config';
 import { saveConfig, loadConfig, getDefaultConfig } from '@/lib/config';
 import { initializeSupabase } from '@/lib/supabase';
@@ -185,7 +184,7 @@ echo "SSL setup completed for ${config.server.domain}"`;
             SMTP
           </TabsTrigger>
           <TabsTrigger value="deploy">
-            <Docker className="h-4 w-4 mr-2" />
+            <Container className="h-4 w-4 mr-2" />
             Deploy
           </TabsTrigger>
         </TabsList>

@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, Save, Upload, Template } from 'lucide-react';
+import { Send, Save, Upload, FileText } from 'lucide-react';
 import { emailService } from '@/lib/email-service';
 import { EmailTemplate } from '@/types/email';
 import { useToast } from '@/hooks/use-toast';
@@ -160,7 +159,7 @@ const EmailCompose = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Template className="h-4 w-4 mr-2" />
+                <FileText className="h-4 w-4 mr-2" />
                 Templates
               </CardTitle>
             </CardHeader>
