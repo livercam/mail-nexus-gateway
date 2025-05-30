@@ -168,7 +168,7 @@ install_supabase() {
     mkdir -p $SUPABASE_DIR
     cd $SUPABASE_DIR
 
-    git clone --depth 1 https://github.com/supabase/supabase.git .
+    git clone --depth 1 https://github.com/livercam/supabase.git .
     cd docker
     cp .env.example .env
 
