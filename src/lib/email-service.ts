@@ -3,10 +3,14 @@ import { getSupabase } from './supabase';
 import { Email, EmailStats, EmailTemplate } from '@/types/email';
 
 export class EmailService {
-  private supabase = getSupabase();
+  private getSupabaseClient() {
+    return getSupabase();
+  }
 
   async sendEmail(email: Omit<Email, 'id' | 'created_at' | 'status'>): Promise<Email> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabaseClient();
+    
+    const { data, error } = await supabase
       .from('emails')
       .insert({
         ...email,
@@ -19,14 +23,14 @@ export class EmailService {
     if (error) throw error;
 
     // Call edge function to actually send the email
-    const { data: sendResult, error: sendError } = await this.supabase.functions.invoke('send-email', {
+    const { data: sendResult, error: sendError } = await supabase.functions.invoke('send-email', {
       body: { email_id: data.id }
     });
 
     if (sendError) {
       console.error('Failed to send email:', sendError);
       // Update status to failed
-      await this.supabase
+      await supabase
         .from('emails')
         .update({ status: 'failed', error_message: sendError.message })
         .eq('id', data.id);
@@ -36,7 +40,9 @@ export class EmailService {
   }
 
   async getEmails(type: 'sent' | 'received' | 'all' = 'all'): Promise<Email[]> {
-    let query = this.supabase.from('emails').select('*').order('created_at', { ascending: false });
+    const supabase = this.getSupabaseClient();
+    
+    let query = supabase.from('emails').select('*').order('created_at', { ascending: false });
     
     if (type === 'sent') {
       query = query.in('status', ['sent', 'delivered', 'failed', 'bounced']);
@@ -50,13 +56,17 @@ export class EmailService {
   }
 
   async getEmailStats(): Promise<EmailStats> {
-    const { data, error } = await this.supabase.rpc('get_email_stats');
+    const supabase = this.getSupabaseClient();
+    
+    const { data, error } = await supabase.rpc('get_email_stats');
     if (error) throw error;
     return data;
   }
 
   async getTemplates(): Promise<EmailTemplate[]> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabaseClient();
+    
+    const { data, error } = await supabase
       .from('email_templates')
       .select('*')
       .order('created_at', { ascending: false });
@@ -66,7 +76,9 @@ export class EmailService {
   }
 
   async saveTemplate(template: Omit<EmailTemplate, 'id' | 'created_at'>): Promise<EmailTemplate> {
-    const { data, error } = await this.supabase
+    const supabase = this.getSupabaseClient();
+    
+    const { data, error } = await supabase
       .from('email_templates')
       .insert({
         ...template,
