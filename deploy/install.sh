@@ -58,58 +58,27 @@ detect_os() {
 
 # Instalar dependências
 install_dependencies() {
-    log "Verificando e instalando dependências..."
-
-    install_if_missing() {
-        local cmd=$1
-        local pkg=$2
-        if ! command -v $cmd > /dev/null 2>&1; then
-            log "Instalando $pkg..."
-            if [[ $OS == "debian" ]]; then
-                apt-get install -y $pkg
-            elif [[ $OS == "rhel" ]]; then
-                yum install -y $pkg
-            fi
-        else
-            log "$pkg já está instalado"
-        fi
-    }
-
+    log "Instalando dependências..."
+    
     if [[ $OS == "debian" ]]; then
         apt-get update
-        install_if_missing curl curl
-        install_if_missing wget wget
-        install_if_missing git git
-        install_if_missing jq jq
-        install_if_missing docker docker.io
-        install_if_missing docker-compose docker-compose
-        install_if_missing certbot certbot
-        install_if_missing nginx nginx
-        install_if_missing ufw ufw
+        apt-get install -y curl wget git jq docker.io docker-compose certbot nginx ufw
     elif [[ $OS == "rhel" ]]; then
         yum update -y
-        install_if_missing curl curl
-        install_if_missing wget wget
-        install_if_missing git git
-        install_if_missing jq jq
-        install_if_missing docker docker
-        install_if_missing docker-compose docker-compose
-        install_if_missing certbot certbot
-        install_if_missing nginx nginx
-        install_if_missing firewall-cmd firewalld
+        yum install -y curl wget git jq docker docker-compose certbot nginx firewalld
         systemctl start docker
     fi
-
+    
     systemctl enable docker
     systemctl start docker
-
+    
+    # Verificar se Docker está funcionando
     if ! docker --version > /dev/null 2>&1; then
         error "Falha na instalação do Docker"
     fi
-
-    log "Todas as dependências estão instaladas"
+    
+    log "Dependências instaladas com sucesso"
 }
-
 
 # Configurar firewall
 setup_firewall() {
@@ -161,33 +130,40 @@ setup_ssl() {
 }
 
 # Instalar Supabase Self-hosted
-
 install_supabase() {
     log "Instalando Supabase Self-hosted..."
-
+    
     mkdir -p $SUPABASE_DIR
     cd $SUPABASE_DIR
-
-    git clone --depth 1 https://github.com/livercam/supabase.git .
+    
+    # Baixar Supabase self-hosted
+    git clone --depth 1 https://github.com/supabase/supabase.git .
     cd docker
+    
+    # Copiar arquivo de exemplo
     cp .env.example .env
-
+    
+    # Gerar chaves aleatórias
     JWT_SECRET=$(openssl rand -base64 32)
     ANON_KEY=$(openssl rand -base64 32)
     SERVICE_ROLE_KEY=$(openssl rand -base64 32)
     POSTGRES_PASSWORD=$(openssl rand -base64 32)
-
-    sed -i "s#POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password#POSTGRES_PASSWORD=$POSTGRES_PASSWORD#" .env
-    sed -i "s#JWT_SECRET=your-super-secret-jwt-token-with-at-least-32-characters-long#JWT_SECRET=$JWT_SECRET#" .env
-    sed -i "s#ANON_KEY=.*#ANON_KEY=$ANON_KEY#" .env
-    sed -i "s#SERVICE_ROLE_KEY=.*#SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY#" .env
-    sed -i "s#SITE_URL=.*#SITE_URL=https://$DOMAIN#" .env
-
+    
+    # Configurar .env
+    sed -i "s/POSTGRES_PASSWORD=your-super-secret-and-long-postgres-password/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
+    sed -i "s/JWT_SECRET=your-super-secret-jwt-token-with-at-least-32-characters-long/JWT_SECRET=$JWT_SECRET/" .env
+    sed -i "s/ANON_KEY=.*$/ANON_KEY=$ANON_KEY/" .env
+    sed -i "s/SERVICE_ROLE_KEY=.*$/SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY/" .env
+    sed -i "s/SITE_URL=.*$/SITE_URL=https:\/\/$DOMAIN/" .env
+    
+    # Iniciar Supabase
     docker-compose up -d
-
+    
+    # Aguardar Supabase inicializar
     log "Aguardando Supabase inicializar..."
     sleep 30
-
+    
+    # Verificar se está funcionando
     for i in {1..10}; do
         if curl -s http://localhost:8000/health > /dev/null; then
             log "Supabase iniciado com sucesso"
@@ -196,7 +172,8 @@ install_supabase() {
         log "Tentativa $i/10 - Aguardando Supabase..."
         sleep 10
     done
-
+    
+    # Salvar credenciais
     cat > $INSTALL_DIR/supabase-credentials.json << EOF
 {
     "url": "http://localhost:8000",
@@ -206,7 +183,7 @@ install_supabase() {
     "jwt_secret": "$JWT_SECRET"
 }
 EOF
-
+    
     log "Supabase instalado e configurado"
 }
 
