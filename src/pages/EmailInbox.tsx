@@ -50,6 +50,7 @@ const EmailInbox = () => {
       delivered: 'default',
       failed: 'destructive',
       bounced: 'destructive',
+      received: 'default',
     };
 
     const labels: Record<Email['status'], string> = {
@@ -58,6 +59,7 @@ const EmailInbox = () => {
       delivered: 'Entregue',
       failed: 'Falhou',
       bounced: 'Rejeitado',
+      received: 'Recebido',
     };
 
     return (

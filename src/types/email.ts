@@ -8,12 +8,12 @@ export interface Email {
   subject: string;
   body: string;
   html?: string;
-  attachments?: EmailAttachment[];
-  status: 'draft' | 'sent' | 'delivered' | 'failed' | 'bounced';
+  status: 'draft' | 'sent' | 'delivered' | 'failed' | 'bounced' | 'received';
   created_at: string;
   sent_at?: string;
   delivered_at?: string;
   error_message?: string;
+  attachments?: EmailAttachment[];
 }
 
 export interface EmailAttachment {
@@ -21,7 +21,7 @@ export interface EmailAttachment {
   filename: string;
   content_type: string;
   size: number;
-  url?: string;
+  url: string;
 }
 
 export interface EmailTemplate {
@@ -30,14 +30,17 @@ export interface EmailTemplate {
   subject: string;
   body: string;
   html?: string;
-  variables?: string[];
+  variables: string[];
   created_at: string;
 }
 
 export interface EmailStats {
   total_sent: number;
   total_received: number;
+  total_failed: number;
+  total_delivered: number;
+  sent_today: number;
+  received_today: number;
+  failed_today: number;
   delivery_rate: number;
-  bounce_rate: number;
-  last_24h: number;
 }
