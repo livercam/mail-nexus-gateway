@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, Mail, Inbox, Settings, LogOut, Server } from 'lucide-react';
+import { LayoutDashboard, Mail, Inbox, Settings, LogOut, Server, Send, Edit } from 'lucide-react';
 import { loadConfig } from '@/lib/config';
 
 const Sidebar = () => {
@@ -22,6 +22,11 @@ const Sidebar = () => {
       icon: LayoutDashboard,
     },
     {
+      name: 'Compor',
+      href: '/compose',
+      icon: Edit,
+    },
+    {
       name: 'Todos',
       href: '/inbox',
       icon: Inbox,
@@ -29,12 +34,12 @@ const Sidebar = () => {
     {
       name: 'Enviados',
       href: '/sent',
-      icon: Mail,
+      icon: Send,
     },
     {
       name: 'Recebidos',
       href: '/received',
-      icon: Inbox,
+      icon: Mail,
     },
     {
       name: 'Configurações',

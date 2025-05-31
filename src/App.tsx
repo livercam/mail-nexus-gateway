@@ -9,6 +9,8 @@ import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
 import EmailCompose from "./pages/EmailCompose";
 import EmailInbox from "./pages/EmailInbox";
+import SentEmails from "./pages/SentEmails";
+import ReceivedEmails from "./pages/ReceivedEmails";
 import Settings from "./pages/Settings";
 import Layout from "./components/layout/Layout";
 
@@ -26,6 +28,8 @@ const App = () => (
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="compose" element={<EmailCompose />} />
             <Route path="inbox" element={<EmailInbox />} />
+            <Route path="sent" element={<SentEmails />} />
+            <Route path="received" element={<ReceivedEmails />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
