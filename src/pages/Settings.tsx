@@ -6,9 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { Save, Server, Mail, Database, Container } from 'lucide-react';
+import { Save, Server, Mail, Database, Container, Key, RefreshCw } from 'lucide-react';
 import { AppConfig, DeployConfig } from '@/types/config';
-import { saveConfig, loadConfig, getDefaultConfig } from '@/lib/config';
+import { saveConfig, loadConfig, getDefaultConfig, getDefaultPassword, autoFillSMTPConfig } from '@/lib/config';
 import { initializeSupabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,15 +20,40 @@ const Settings = () => {
     ssl_setup_script: '',
     environment_vars: {}
   });
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     const savedConfig = loadConfig();
     if (savedConfig) {
       setConfig(savedConfig);
+    } else {
+      // Primeiro acesso - configurar senha padrão
+      const defaultConfig = getDefaultConfig();
+      setConfig(defaultConfig);
     }
     generateDeployConfig();
   }, []);
+
+  const handleAutoFillSMTP = () => {
+    if (config.server.domain && config.server.vps_ip) {
+      const smtpConfig = autoFillSMTPConfig(config.server.domain, config.server.vps_ip);
+      setConfig({
+        ...config,
+        smtp: smtpConfig
+      });
+      toast({
+        title: "SMTP Preenchido",
+        description: "Configurações SMTP foram preenchidas automaticamente.",
+      });
+    } else {
+      toast({
+        title: "Erro",
+        description: "Configure o domínio e IP do servidor primeiro.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSave = () => {
     try {
@@ -175,6 +200,10 @@ echo "SSL setup completed for ${config.server.domain}"`;
             <Server className="h-4 w-4 mr-2" />
             Servidor
           </TabsTrigger>
+          <TabsTrigger value="security">
+            <Key className="h-4 w-4 mr-2" />
+            Segurança
+          </TabsTrigger>
           <TabsTrigger value="supabase">
             <Database className="h-4 w-4 mr-2" />
             Supabase
@@ -236,6 +265,41 @@ echo "SSL setup completed for ${config.server.domain}"`;
           </Card>
         </TabsContent>
 
+        <TabsContent value="security">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configurações de Segurança</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="default_password">Senha Padrão do Sistema</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="default_password"
+                    type={showPassword ? "text" : "password"}
+                    value={config.default_password || getDefaultPassword()}
+                    onChange={(e) => setConfig({
+                      ...config,
+                      default_password: e.target.value
+                    })}
+                    placeholder="Senha padrão"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "Ocultar" : "Mostrar"}
+                  </Button>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Esta senha é gerada automaticamente no primeiro acesso e pode ser alterada.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="supabase">
           <Card>
             <CardHeader>
@@ -287,7 +351,18 @@ echo "SSL setup completed for ${config.server.domain}"`;
         <TabsContent value="smtp">
           <Card>
             <CardHeader>
-              <CardTitle>Configurações SMTP</CardTitle>
+              <CardTitle className="flex items-center justify-between">
+                Configurações SMTP
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAutoFillSMTP}
+                  className="flex items-center gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Preencher Automaticamente
+                </Button>
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

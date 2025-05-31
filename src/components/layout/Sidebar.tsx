@@ -22,13 +22,18 @@ const Sidebar = () => {
       icon: LayoutDashboard,
     },
     {
-      name: 'Compor Email',
-      href: '/compose',
+      name: 'Todos',
+      href: '/inbox',
+      icon: Inbox,
+    },
+    {
+      name: 'Enviados',
+      href: '/sent',
       icon: Mail,
     },
     {
-      name: 'Inbox',
-      href: '/inbox',
+      name: 'Recebidos',
+      href: '/received',
       icon: Inbox,
     },
     {
@@ -47,21 +52,23 @@ const Sidebar = () => {
         </div>
       </div>
       
-      <div className="flex-1 px-3 py-2 space-y-1">
-        {navigationItems.map((item) => (
-          <Link key={item.href} to={item.href}>
-            <Button
-              variant="ghost"
-              className={cn(
-                'w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                isActive(item.href) && 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-              )}
-            >
-              <item.icon className="h-5 w-5 mr-2" />
-              {item.name}
-            </Button>
-          </Link>
-        ))}
+      <div className="flex-1 px-3 py-2">
+        <div className="space-y-2">
+          {navigationItems.map((item) => (
+            <Link key={item.href} to={item.href} className="block">
+              <Button
+                variant="ghost"
+                className={cn(
+                  'w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground py-3 h-auto',
+                  isActive(item.href) && 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+                )}
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                <span className="text-left">{item.name}</span>
+              </Button>
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="p-3 mt-auto border-t border-sidebar-border">

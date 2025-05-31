@@ -19,8 +19,6 @@ export interface ServerConfig {
   vps_ip: string;
   domain: string;
   ssl_enabled: boolean;
-  ssl_cert_path?: string;
-  ssl_key_path?: string;
 }
 
 export interface AppConfig {
@@ -29,6 +27,7 @@ export interface AppConfig {
   server: ServerConfig;
   app_name: string;
   timezone: string;
+  default_password?: string;
 }
 
 export interface DeployConfig {
