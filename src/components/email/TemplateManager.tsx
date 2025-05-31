@@ -61,8 +61,13 @@ const TemplateManager = ({ templates, onTemplateUpdate, onTemplateSelect }: Temp
 
     try {
       if (editingTemplate) {
-        // Update existing template - would need update method in service
-        console.log('Update template:', editingTemplate.id);
+        await emailService.updateTemplate(editingTemplate.id, {
+          name: formData.name,
+          subject: formData.subject,
+          body: formData.body,
+          html: formData.html || undefined,
+          variables: [], // Could extract variables from template
+        });
       } else {
         await emailService.saveTemplate({
           name: formData.name,
@@ -93,8 +98,7 @@ const TemplateManager = ({ templates, onTemplateUpdate, onTemplateSelect }: Temp
     if (!confirm('Tem certeza que deseja excluir este template?')) return;
 
     try {
-      // Would need delete method in service
-      console.log('Delete template:', templateId);
+      await emailService.deleteTemplate(templateId);
       toast({
         title: "Template Excluído",
         description: "O template foi excluído com sucesso.",
