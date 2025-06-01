@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,7 @@ import ReceivedEmails from "./pages/ReceivedEmails";
 import Settings from "./pages/Settings";
 import Layout from "./components/layout/Layout";
 import Templates from "./pages/Templates";
+import Deploy from "./pages/Deploy";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +33,7 @@ const App = () => (
             <Route path="sent" element={<SentEmails />} />
             <Route path="received" element={<ReceivedEmails />} />
             <Route path="templates" element={<Templates />} />
+            <Route path="deploy" element={<Deploy />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
