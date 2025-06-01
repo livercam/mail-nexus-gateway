@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ import {
   CheckCircle, 
   AlertTriangle,
   Terminal,
-  Docker,
+  Container,
   Globe,
   Shield
 } from 'lucide-react';
@@ -240,7 +239,7 @@ curl -sSL https://raw.githubusercontent.com/mail-nexus/gateway/main/deploy/insta
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Docker className="h-5 w-5" />
+              <Container className="h-5 w-5" />
               Docker Compose
             </CardTitle>
           </CardHeader>

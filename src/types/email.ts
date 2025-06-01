@@ -44,3 +44,7 @@ export interface EmailStats {
   failed_today: number;
   delivery_rate: number;
 }
+
+export interface EmailFilter {
+  type: 'all' | 'sent' | 'received' | 'failed' | 'delivered';
+}

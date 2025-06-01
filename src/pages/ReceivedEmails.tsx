@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,7 +34,7 @@ const ReceivedEmails = () => {
   const loadReceivedEmails = async () => {
     try {
       setLoading(true);
-      const receivedEmails = await emailService.getEmails('received', filters);
+      const receivedEmails = await emailService.getEmails('received');
       setEmails(receivedEmails);
     } catch (error) {
       toast({

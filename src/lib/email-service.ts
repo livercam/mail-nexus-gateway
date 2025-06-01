@@ -1,4 +1,3 @@
-
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { Email, EmailStats, EmailTemplate, EmailFilter } from '@/types/email';
 
@@ -178,6 +177,29 @@ class EmailService {
       return sentEmail;
     } catch (error) {
       console.error('Error in sendEmail:', error);
+      throw error;
+    }
+  }
+
+  async deleteEmail(id: string): Promise<void> {
+    if (!isSupabaseConfigured()) {
+      console.log('Mock: Email deleted', id);
+      return;
+    }
+
+    try {
+      const supabase = getSupabase();
+      const { error } = await supabase
+        .from('emails')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error deleting email:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error in deleteEmail:', error);
       throw error;
     }
   }
