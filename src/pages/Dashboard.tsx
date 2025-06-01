@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,7 +69,7 @@ const Dashboard = () => {
     const config = loadConfig();
     if (!config) {
       setSystemStatus('offline');
-    } else if (!config.supabase.url || !config.smtp.host) {
+    } else if (!config.supabase?.url || !config.server.smtp_host) {
       setSystemStatus('warning');
     } else {
       setSystemStatus('online');
@@ -245,15 +244,19 @@ const Dashboard = () => {
                 <span className="font-medium">{config?.server.vps_ip || 'Não configurado'}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">SSL:</span>
-                <Badge variant={config?.server.ssl_enabled ? 'default' : 'secondary'}>
-                  {config?.server.ssl_enabled ? 'Habilitado' : 'Desabilitado'}
-                </Badge>
+                <span className="text-gray-600">SMTP Host:</span>
+                <span className="font-medium">{config?.server.smtp_host || 'Não configurado'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">SMTP:</span>
-                <Badge variant={config?.smtp.host ? 'default' : 'secondary'}>
-                  {config?.smtp.host ? 'Configurado' : 'Pendente'}
+                <Badge variant={config?.server.smtp_host ? 'default' : 'secondary'}>
+                  {config?.server.smtp_host ? 'Configurado' : 'Pendente'}
+                </Badge>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Supabase:</span>
+                <Badge variant={config?.supabase?.url ? 'default' : 'secondary'}>
+                  {config?.supabase?.url ? 'Configurado' : 'Pendente'}
                 </Badge>
               </div>
             </div>

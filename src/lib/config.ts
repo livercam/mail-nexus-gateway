@@ -30,3 +30,14 @@ export const loadConfig = (): AppConfig => {
 export const saveConfig = (config: AppConfig): void => {
   localStorage.setItem('app_config', JSON.stringify(config));
 };
+
+export const isConfigured = (): boolean => {
+  const config = loadConfig();
+  return !!(
+    config.server.domain &&
+    config.server.smtp_host &&
+    config.server.smtp_user &&
+    config.supabase?.url &&
+    config.supabase?.anon_key
+  );
+};
