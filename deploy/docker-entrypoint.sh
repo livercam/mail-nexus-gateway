@@ -27,18 +27,35 @@ if [ ! -z "$VPS_IP" ]; then
     sed -i "s/__VPS_IP__/$VPS_IP/g" /etc/nginx/nginx.conf
 fi
 
-# Generate self-signed certificate if SSL certificates don't exist
-if [ ! -f "/etc/nginx/ssl/cert.pem" ]; then
+# Check for Let's Encrypt certificates first, then generate self-signed if needed
+if [ ! -z "$DOMAIN" ] && [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ]; then
+    log "Using Let's Encrypt certificates for $DOMAIN"
+    # Update nginx config to use Let's Encrypt certificates
+    sed -i "s|/etc/nginx/ssl/fullchain.pem|/etc/letsencrypt/live/$DOMAIN/fullchain.pem|g" /etc/nginx/nginx.conf
+    sed -i "s|/etc/nginx/ssl/privkey.pem|/etc/letsencrypt/live/$DOMAIN/privkey.pem|g" /etc/nginx/nginx.conf
+elif [ ! -f "/etc/nginx/ssl/fullchain.pem" ]; then
     log "Generating self-signed SSL certificate..."
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -keyout /etc/nginx/ssl/key.pem \
-        -out /etc/nginx/ssl/cert.pem \
-        -subj "/C=BR/ST=State/L=City/O=Organization/CN=${DOMAIN:-localhost}"
+        -keyout /etc/nginx/ssl/privkey.pem \
+        -out /etc/nginx/ssl/fullchain.pem \
+        -subj "/C=BR/ST=State/L=City/O=Organization/CN=${DOMAIN:-localhost}" \
+        >/dev/null 2>&1
+    log "Self-signed certificate generated"
 fi
+
+# Fix permissions
+chown -R nginx:nginx /var/log/nginx /var/cache/nginx 2>/dev/null || true
+chmod -R 755 /var/log/nginx /var/cache/nginx 2>/dev/null || true
 
 # Test nginx configuration
 log "Testing nginx configuration..."
-nginx -t
+if nginx -t >/dev/null 2>&1; then
+    log "Nginx configuration is valid"
+else
+    log "ERROR: Nginx configuration is invalid"
+    nginx -t
+    exit 1
+fi
 
 log "Mail Nexus Gateway started successfully"
 

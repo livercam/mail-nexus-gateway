@@ -1,0 +1,28 @@
+
+version: '3.8'
+
+services:
+  $$cap_appname:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 80
+      SUPABASE_URL: $$cap_supabase_url
+      SUPABASE_ANON_KEY: $$cap_supabase_anon_key
+      SUPABASE_SERVICE_ROLE_KEY: $$cap_supabase_service_key
+      SMTP_HOST: $$cap_smtp_host
+      SMTP_PORT: $$cap_smtp_port
+      SMTP_USER: $$cap_smtp_user
+      SMTP_PASS: $$cap_smtp_pass
+      SMTP_SECURE: $$cap_smtp_secure
+      DOMAIN: $$cap_domain
+      VPS_IP: $$cap_vps_ip
+    volumes:
+      - $$cap_appname-data:/app/data
+      - $$cap_appname-logs:/app/logs
+    restart: unless-stopped
+    caproverExtra:
+      containerHttpPort: 80
+      notExposeAsWebApp: false
